@@ -1,233 +1,180 @@
 <?php
 
 class Modello{
-	
-	public function tavola($limite){ //STAMPA LA TAVOLA PERIODICA ORIGINALE
-		echo '<div style="float:left; width:48%">';
-		echo '<h1 align="center">Tavola pitagorica</h1>';
-		echo '<table align="center" border=1 cellpadding=5>';
-		for($riga=1; $riga <= $limite; $riga++)
-		{
-			echo '<tr>';
-			for($colonna=1;$colonna<=$limite;$colonna++)
-            {
-                $valore= $riga * $colonna;
-                echo '<td>';
-                echo $valore;
-                echo '</td>';
-            }
-            echo '</tr>';
+
+    private $limite;
+    private $matrice;
+    private $FILENAME;
+
+
+    public function __construct(){
+        $this->limite = 10;
+        $this->matrice = $this->crea_matrice($this->limite);
+        $this->FILENAME = "tavola_periodica";
+    }
+
+
+    public function crea_matrice($limite){  //	SCRIVE LA TAVOLA PITAGORICA SOTTOFORMA DI MATRICE
+
+		for($riga=1; $riga <= $limite; $riga++) {
+			for($colonna=1;$colonna<=$limite;$colonna++) {
+				$valore= $riga * $colonna;
+				$matrice[$riga-1][$colonna-1]=$valore;
+			}
 		}
-		echo '</table>';
-		echo '</div>';
-	}
-	
-	public function stampa($matrice,$limite){  //	STAMPA LA MATRICE PASSATA COME PARAMETRO
-		echo '<div style="float:left; width:48%">';
-		echo '<table align="center" border=1 cellpadding=5>';
-			for($i=0; $i < $limite; $i++)
-			{
-				echo '<tr>';
-        
-				for($j=0;$j<$limite;$j++)
-				{
-					echo '<td>'; 
-					echo $matrice[$i][$j];
-					echo '</td>';
-				}
-			echo '</tr>';
-			}
-		echo '</table>';
-		echo '</div>';
-	}
-	
-	public function crea_matrice($limite){  //	SCRIVE LA TAVOLA PITAGORICA SOTTOFORMA DI MATRICE
-		
-			for($riga=1; $riga <= $limite; $riga++)
-			{        
-				for($colonna=1;$colonna<=$limite;$colonna++)
-				{
-					$valore= $riga * $colonna;
-					$matrice[$riga-1][$colonna-1]=$valore;
-					//$matrice[$riga-1][$colonna-1];
-				}
-			}
-			return $matrice;
-	}
-	
-	public function tabella_file(){ //SCRIVE LA TAVOLA PITAGORICA SU UN FILE
-		
-	$tavola = "tavola_periodica";
-			touch($tavola);
-			chmod($tavola, 0777);
-
-	$fp=fopen($tavola,"w");
-	$limite=10;
-
-	for($riga=1; $riga <= $limite; $riga++) {
-		for ($colonna = 1; $colonna <= $limite; $colonna++) {
-			$valore = $riga * $colonna;
-			fprintf($fp, $valore);
-		}
-		fprintf($fp, "\n");
-	}
-	fclose($fp);
-	
-	}
-
-	public function primaria_x($matrice,$limite) // SOSTITUISCE I VALORI ELLA DIAGONALE PRIMARIA CON UNA "X"
-		{
-			for($i=0; $i < $limite; $i++)
-			{
-				for($j=0;$j<$limite;$j++)
-				{
-					if($i==$j){
-						$matrice[$i][$j]="X";
-					}
-				}
-			}
 		return $matrice;
+	}
+
+
+	public function stampa(){  //	STAMPA LA MATRICE PASSATA COME PARAMETRO
+		echo '<div style="float:left; width:48%">';
+        echo '<h1 align="center">Tavola pitagorica</h1>';
+		echo '<table align="center" border=1 cellpadding=5>';
+
+		for($i=0; $i < $this->limite; $i++) {
+			echo '<tr>';
+
+			for($j=0;$j<$this->limite;$j++) {
+				echo '<td>';
+				echo $this->matrice[$i][$j];
+				echo '</td>';
+			}
+			echo '</tr>';
 		}
+		echo '</table>';
+		echo '</div>';
+
+	}
+
 	
-	public function secondaria_x($matrice,$limite) // SOSTITUISCE I VALORI DELLA DIAGONALE SECONDARIA CON UNA "X"
-		{
+	public function tabella_file(){  //SCRIVE LA TAVOLA PITAGORICA SU UN FILE
+
+		touch($this->FILENAME);
+		chmod($this->FILENAME, 0777);
+
+		$fp = fopen($this->FILENAME, "w");
+
+
+        for($i=0; $i < $this->limite; $i++) {
+            for($j=0;$j<$this->limite;$j++) {
+                fprintf($fp, $this->matrice[$i][$j]);
+            }
+            fprintf($fp, "\n");
+        }
+
+		fclose($fp);
+	}
+
+
+	public function primaria_x(){ // SOSTITUISCE I VALORI ELLA DIAGONALE PRIMARIA CON UNA "X"
+			for($i=0; $i < $this->limite; $i++) {
+				for($j=0;$j<$this->limite;$j++) {
+					if($i==$j) $this->matrice[$i][$j]="X";
+				}
+			}
+	}
+
+
+	public function secondaria_x(){ // SOSTITUISCE I VALORI DELLA DIAGONALE SECONDARIA CON UNA "X"
 		$x=0;
 		$z=9;
-		for($i=0; $i < $limite; $i++)
-		{
-            for($j=0; $j < $limite; $j++)
-            {
+		for($i=0; $i < $this->limite; $i++) {
+            for($j=0; $j < $this->limite; $j++) {
 				if($j == $z && $i == $x){	
-					$matrice[$i][$j] = "X";
+					$this->matrice[$i][$j] = "X";
 					--$z;
 					$x++;
 				}
             }
 		}
-		return $matrice;
-		}
-		
-	public function righe_pari_5($matrice,$limite) //INCREMENTA LE RIGHE PARI DI 5
-		{
+    }
 
-		for($riga=1; $riga <= $limite; $riga++)
-		{
-            for($colonna=1;$colonna<=$limite;$colonna++)
-            {
-				if($riga%2 == 0){
-					$matrice[$riga-1][$colonna-1] = $matrice[$riga-1][$colonna-1] + 5;
-				}
+
+	public function righe_pari_5(){ //INCREMENTA LE RIGHE PARI DI 5
+		for($riga=1; $riga <= $this->limite; $riga++) {
+            for($colonna=1;$colonna<=$this->limite;$colonna++) {
+				if($riga%2 == 0)	$this->matrice[$riga-1][$colonna-1] += 5;
 			}
 		}
-			return $matrice;
-		}
-		
-	public function colonne_dispari_7($matrice,$limite) //DECREMENTA LE COLONNE DISPARI DI 7
-		{
+	}
 
-		for($riga=1; $riga <= $limite; $riga++)
-		{
-            for($colonna=1;$colonna<=$limite;$colonna++)
-            {
-				if($colonna%2 != 0){
-					$matrice[$riga-1][$colonna-1] = $matrice[$riga-1][$colonna-1] - 7;
-				}
+
+	public function colonne_dispari_7(){ //DECREMENTA LE COLONNE DISPARI DI 7
+		for($riga=1; $riga <= $this->limite; $riga++) {
+            for($colonna=1;$colonna<=$this->limite;$colonna++) {
+				if($colonna%2 != 0)		$this->matrice[$riga-1][$colonna-1] -= 7;
 			}
 		}
-			return $matrice;
-		}
-		
-	public function somma_primaria($matrice,$limite) //SOMMA I VALORI DELLA DIAGONALE PRIMARIA
-	{
+	}
+
+
+	public function somma_primaria(){ //SOMMA I VALORI DELLA DIAGONALE PRIMARIA
 		$somma = 0;
-		for($riga=1; $riga <= $limite; $riga++)
-		{
-            for($colonna=1;$colonna<=$limite;$colonna++)
-            {
-				if($riga == $colonna){
-					$somma = $somma+$matrice[$riga-1][$colonna-1];
-				}
+		for($riga=1; $riga <= $this->limite; $riga++) {
+            for($colonna=1;$colonna<=$this->limite;$colonna++) {
+				if($riga == $colonna) $somma += $this->matrice[$riga-1][$colonna-1];
             }
          }
 		return $somma;
     }
-    
-    public function somma_righe($matrice) //AGGIUNGE UNA COLONNA CONTENENTE LE SOMME DEI VALORI DI OGNI RIGA
-    {
-    	
-	$limite=11;
 
-	$somma = 0;
+
+    public function somma_righe(){ //AGGIUNGE UNA COLONNA CONTENENTE LE SOMME DEI VALORI DI OGNI RIGA
+		$somma = 0;
+		$limite = ($this->limite + 1);
 	
-	echo '<div style="float:left; width:48%">';
-	echo '<h1 align="center">Somma dei valori di ogni riga</h1>';
-	echo '<table align="center" border=1 cellpadding=5>';
+		echo '<div style="float:left; width:48%">';
+		echo '<h1 align="center">Somma dei valori di ogni riga</h1>';
+		echo '<table align="center" border=1 cellpadding=5>';
 
-	for($riga=1; $riga <= $limite; $riga++)
-    {
-      
-        if($riga < 11){
-			echo '<tr>';
-			}else{
-				break;
-				} 
+		for($riga=1; $riga <= $limite; $riga++){
+        	if($riga < $limite) echo '<tr>';
+        	else	break;
 
-            for($colonna=1;$colonna<=$limite;$colonna++)
-            {
-				if ($colonna == 11){
-					
-					echo '<td>'; 
-					echo $somma; 
-					echo '</td>';
-					$somma=0;
-					
-				}else{
-                $somma = $somma+$matrice[$riga-1][$colonna-1];
-                echo '<td>'; 
-                echo $matrice[$riga-1][$colonna-1]; 
-                echo '</td>';
-            }}
-        if($riga < 11){echo '</tr>';} 
-    }
-    echo '</table>';
-	echo '</div>';
+        	for($colonna=1; $colonna <= $limite; $colonna++) {
+        		if ($colonna == $limite){
+        			echo '<td>';
+        			echo $somma;
+        			echo '</td>';
+        			$somma = 0;
+        		}else{
+        			$somma = $somma + $this->matrice[$riga-1][$colonna-1];
+        			echo '<td>';
+        			echo $this->matrice[$riga-1][$colonna-1];
+        			echo '</td>';
+        		}
+        	}
+        	if($riga < $limite) echo '</tr>';
+    	}
+    	echo '</table>';
+		echo '</div>';
 	}
-	
-	public function somma_colonne($matrice,$limite) //AGGIUNGE UNA RIGA CONTENENTE LE SOMME DEI VALORI DI OGNI COLONNA
-	{
-		$limite=10;
-		for($i=0; $i<$limite; $i++)
-		{
-				$somma[$i]=0;
-		}
+
+
+	public function somma_colonne(){ //AGGIUNGE UNA RIGA CONTENENTE LE SOMME DEI VALORI DI OGNI COLONNA
+
+		for($i=0; $i < $this->limite; $i++)	$somma[$i]=0;
 		
-	for($colonna = 0; $colonna<$limite; $colonna++)
-	{
-			for($riga = 0; $riga<$limite; $riga++)
-			{
-					$somma[$colonna] = $somma[$colonna] + $matrice[$riga][$colonna];
-			}
-	}
+		for($colonna = 0; $colonna<$this->limite; $colonna++) {
+			for($riga = 0; $riga<$this->limite; $riga++)	$somma[$colonna] = $somma[$colonna] + $this->matrice[$riga][$colonna];
+		}
 	
-	echo '<div style="float:left; width:48%">';
-	echo '<h1 align="center">Somma dei valori d ogni colonna</h1>';
-	echo '<table align="center" border=1 cellpadding=5>';
-		for($i=0; $i < $limite; $i++)
-		{
+		echo '<div style="float:left; width:48%">';
+		echo '<h1 align="center">Somma dei valori d ogni colonna</h1>';
+		echo '<table align="center" border=1 cellpadding=5>';
+		for($i=0; $i < $this->limite; $i++) {
 			echo '<tr>';
         
-			for($j=0; $j<$limite; $j++)
-			{
+			for($j=0; $j<$this->limite; $j++) {
 				echo '<td>'; 
-				echo $matrice[$i][$j];
+				echo $this->matrice[$i][$j];
 				echo '</td>';
 			}
 			echo '</tr>';
 		}
 		
 		echo'<tr>';
-			for($i=0; $i<$limite; $i++)
-			{
+			for($i=0; $i<$this->limite; $i++) {
 				echo '<td>';
 				echo $somma[$i];
 				echo '</td>';
@@ -236,47 +183,40 @@ class Modello{
 		echo '</table>';
 		echo '</div>';   		
 	}
-	
-	public function inverti_primaria($matrice,$limite) //INVERTE I VALORI DELLA DIAGONALE PRIMARIA
-	{
-	$j=10;
 
-		for($i=0;$i<10;$i++)
-		{	
-			$matrice[$i][$i]=$j*$j;
+
+	public function inverti_primaria() { //INVERTE I VALORI DELLA DIAGONALE PRIMARIA
+		$j=10;
+
+		for($i=0;$i<10;$i++) {
+			$this->matrice[$i][$i]=$j*$j;
 			--$j;
 		}
-		return $matrice;
 	}
-	
-	public function inverti_righe($matrice,$limite) //INVERTE I VALORI DI OGNI RIGA
-	{
-	
-		for($riga=1; $riga <= $limite; $riga++)
-		{
+
+
+	public function inverti_righe(){ //INVERTE I VALORI DI OGNI RIGA
+
+		for($riga=1; $riga <= $this->limite; $riga++) {
         $x=10;
-            for($colonna=1;$colonna<=$limite;$colonna++)
-            {
-				$matrice[$riga-1][$colonna-1]=$riga*$x;
-				$x=$x-1;
+            for($colonna=1;$colonna<=$this->limite;$colonna++) {
+				$this->matrice[$riga-1][$colonna-1] = $riga*$x;
+				$x -= 1;
             }
 		}
-		return $matrice;
 	}
-	
-	public function inverti_colonne($matrice,$limite) //INVERTE I VALORI DI OGNI COLONNA
-	{		
-		for($colonna=1; $colonna <= $limite; $colonna++)
-		{
+
+
+	public function inverti_colonne(){ //INVERTE I VALORI DI OGNI COLONNA
+
+		for($colonna = 1; $colonna <= $this->limite; $colonna++){
 			$x=1;
-            for($riga=10; $riga > 0; --$riga)
-            {
-             $matrice[$riga-1][$colonna-1]=$colonna*$x;
+            for($riga = 10; $riga > 0; --$riga){
+             $this->matrice[$riga-1][$colonna-1] = $colonna*$x;
              $x++;
             }
 		}
-		return $matrice;
 	}
 		
 }
-?>
+
